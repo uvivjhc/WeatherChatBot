@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>옷차림 추천 챗봇</title>
+  <link rel="stylesheet" href = "WeatChatUICSS.css">
+</head>
+<body>
+<div id="splash-screen">
+    <img id="splash-logo" src="Splash_Img/SplashImg.png" alt="SplashImg">
+</div>
+<script>
+    // 스플래시 화면 표시 시간 (밀리초)
+    const splashScreenDuration = 2000; //1초
+
+    // 로딩 완료 후 스플래시 화면 숨기기
+    function hideSplashScreen() {
+      const splashScreen = document.getElementById('splash-screen');
+      splashScreen.style.display = 'none';
+    }
+
+    // 일정 시간 후 스플래시 화면 숨기기
+    setTimeout(() => {
+      splash.style.display = "none";
+    }, 2000);
+    setTimeout(hideSplashScreen, splashScreenDuration);
+</script>
+
+<div class="chat-container">
+  <div class="chat-header">👕 오늘 뭐 입지?</div> 
+  <div class="chat-body" id="chat-body">
+    <div class="message bot">안녕하세요! 현재 날씨나 온도를 입력하면 옷차림을 추천해드릴게요 ☀️❄️</div>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="user-input" placeholder="예: 오늘 28도이고 날씨는 맑아" />
+    <button onclick="sendMessage()">전송</button>
+  </div>
+</div>
+
+<script>
+
+  fetch("https://apihub.kma.go.kr/api/typ01/url/fct_shrt_reg.php?tmfc=0&authKey=Z3ezCl_GSea3swpfxknmKw")
+          .then((response) => response.json())
+          .then((data) => 
+            data.forEach(elem => {
+                document.querySelector("#container").innerHTML += `
+                    <tr>
+                        <td>${elem.tmfc}</td>
+                        <td>${elem.tmef}</td>
+                        <td>${elem.vars}</td>
+                        <td>${elem.authKey}</td>
+                    </tr>`;
+            }))
+          .catch((error) =>
+            document.querySelector("#container").innerHTML += `
+            <tr>
+                <td colspan="4">Error occurred.</td>
+            </tr>
+  `);
+  function sendMessage() {
+    const input = document.getElementById("user-input");
+    const message = input.value.trim();
+    if (!message) 
+      
+      return;
+
+    appendMessage(message, 'user');
+
+    // 간단한 룰 기반 응답 예시 (AI 연동 전)
+    let response = '';
+    if (message.includes('12도')) {
+      response = '오늘은 쌀쌀하네요! 코트나 가벼운 패딩을 추천드려요.';
+    } else if (message.includes('25도')) {
+      response = '따뜻한 날씨네요. 반팔과 얇은 바지를 입으셔도 좋아요!';
+    } else {
+      response = '날씨나 온도를 알려주시면 옷차림을 추천해드릴게요.';
+    }
+
+    setTimeout(() => {
+      appendMessage(response, 'bot');
+    }, 500);
+
+    input.value = '';
+  }
+
+  function appendMessage(text, sender) {
+    const chatBody = document.getElementById("chat-body");
+    const div = document.createElement("div");
+    div.className = `message ${sender}`;
+    div.textContent = text;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
